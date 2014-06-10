@@ -1,50 +1,64 @@
 (function() {
 
-var Shader = this.shader = function() {
-    this.cache = [];
-};
+var Shader = this.Shader = {
 
-Shader.prototype = {
+    add: function( shaderName, userShader ) {
 
-    constructor: Shader,
+        var me = this,
+            container, shader;
 
-    load: function() {
-        var me = this;
+        try {
+            container = document.getElementById(shaderName);
+            shader = {
+                fragment: container.querySelectorAll('script[type="x-shader/x-fragment"]')[0].innerText,
+                vertex: container.querySelectorAll('script[type="x-shader/x-vertex"]')[0].innerText
+            };
+        } catch( e ) {
+            throw 'Shader ' + shaderName + ' could not be loaded! Please make sure it is in the DOM.';
+        }
 
-        _.each( me.shaders, function( _fn, shaderName ) {
-            var container = document.getElementById('#' + shaderName),
-                shader = {
-                    fragment: container.querySelectorAll('script[type="x-shader/x-fragment"]').innerText,
-                    vertex: container.querySelectorAll('script[type="x-shader/x-vertex"]').innerText
-                };
+        shader.src = shader.fragment + '\n' + shader.vertex;
+        _.extend( shader, me.parseMembers( shader.src ) );
 
-            if( !(shader.fragment && shader.vertex) ) {
-                throw 'Shader ' + shaderName + ' could not be loaded! Please make sure it is in the DOM.';
+        me.shaders[ shaderName ] = function() {
+            var material;
+
+            shader.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+
+            for( var key in userShader.uniforms ) {
+                if( shader.uniforms[ key ] ) {
+                     shader.uniforms[ key ].value = userShader.uniforms[ key ] ;
+
+                     if( userShader.uniforms[ key ] instanceof THREE.Color ) {
+                         shader.uniforms[ key ].type = 'c';
+                     }
+                }
             }
 
-            shader.src = shader.fragment + '\n' + shader.vertex;
-            _.extend( shader, me.parseMembers( shader.src ) );
-
-            me.shaders[ shaderName ] = function() {
-                var args = Array.prototype.slice( arguments, 0 ),
-                    material;
-
-                shader.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-
-                args = [ shader ].concat( args );
-                material = _fn.apply( me, args );
-
-                _.each( material.uniforms, function( uniform, key ) {
-                    if( uniform.value instanceof THREE.Color ) {
-                        material.uniforms[ key ].type = 'c';
-                    }
-                });
-
-                me.cache.push( material );
-
-                return material;
+            var shaderData = {
+                fragmentShader: shader.fragment,
+                vertexShader: shader.vertex,
+                uniforms:  shader.uniforms,
+                attributes: shader.attributes
             };
-        });
+
+            if( 'transparent' in userShader ) {
+                shaderData.transparent = userShader.transparent;
+            }
+
+            material = new THREE.ShaderMaterial( shaderData );
+
+            if( userShader.init ) {
+                userShader.init( material );
+                material.needsUpdate = true;
+            }
+
+            material.name = shaderName;
+
+            me.cache.push( material );
+
+            return material;
+        };
     },
 
     umap: {
@@ -106,7 +120,7 @@ Shader.prototype = {
 
     },
 
-    cache: {},
+    cache: [],
 
     shaders: {}
 };
