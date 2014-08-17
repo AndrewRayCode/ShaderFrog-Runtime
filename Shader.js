@@ -1,64 +1,83 @@
 (function() {
 
 var Shader = this.Shader = {
+    
+    add: function( shaderName, config ) {
 
-    add: function( shaderName, userShader ) {
-
-        var me = this,
-            container, shader;
-
-        try {
-            container = document.getElementById(shaderName);
-            shader = {
-                fragment: container.querySelectorAll('script[type="x-shader/x-fragment"]')[0].innerText,
-                vertex: container.querySelectorAll('script[type="x-shader/x-vertex"]')[0].innerText
-            };
-        } catch( e ) {
-            throw 'Shader ' + shaderName + ' could not be loaded! Please make sure it is in the DOM.';
-        }
-
-        shader.src = shader.fragment + '\n' + shader.vertex;
-        _.extend( shader, me.parseMembers( shader.src ) );
+        var me = this;
 
         me.shaders[ shaderName ] = function() {
-            var material;
 
-            shader.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+            // Pull out any hard coded strings if we have them
+            //for( var uType in config.uniforms ) {
+                //if( config.uniforms[ uType ] === 'mirror' ) {
+                    //config.uniforms[ uType ] = me.mirror.renderTarget;
+                //}
+            //}
 
-            for( var key in userShader.uniforms ) {
-                if( shader.uniforms[ key ] ) {
-                     shader.uniforms[ key ].value = userShader.uniforms[ key ] ;
+            //var baseUniforms = THREE.UniformsUtils.clone( config.uniforms ),
+                //baseAttributes = THREE.UniformsUtils.clone( config.attributes ),
+            var src = config.fragment + '\n' + config.vertex,
+                typed = me.parseMembers( src ),
+                uniforms = _.clone( config.uniforms || {} ),
+                attributes = _.clone( config.attributes || {} );
 
-                     if( userShader.uniforms[ key ] instanceof THREE.Color ) {
-                         shader.uniforms[ key ].type = 'c';
-                     }
+            for( var key in config.uniforms ) {
+
+                if( uniforms[ key ] === 'mirror' ) {
+
+                    uniforms[ key ] = {
+                        type: 't',
+                        value: me.mirror.renderTarget
+                    };
+
+                } else {
+
+                    uniforms[ key ] = {
+                        value: config.uniforms[ key ],
+                        type: typed.uniforms[ key ].type
+                    };
+
+                    if( uniforms[ key ].value instanceof THREE.Color ) {
+                        uniforms[ key ].type = 'c';
+                    }
+
                 }
             }
 
-            var shaderData = {
-                fragmentShader: shader.fragment,
-                vertexShader: shader.vertex,
-                uniforms:  shader.uniforms,
-                attributes: shader.attributes
+            uniforms.viewVector = {
+                type: 'v3',
+                value: new THREE.Vector3(0,0,0)
             };
 
-            if( 'transparent' in userShader ) {
-                shaderData.transparent = userShader.transparent;
+            var shaderData = {
+                uniforms: uniforms,
+                attributes: attributes,
+                fragmentShader: config.fragment,
+                vertexShader: config.vertex
+            };
+
+            if( 'transparent' in config ) {
+                shaderData.transparent = config.transparent;
             }
 
-            material = new THREE.ShaderMaterial( shaderData );
+            var material = new THREE.ShaderMaterial( shaderData );
+            material.name = shaderName;
+            me.cache.push( material );
 
-            if( userShader.init ) {
-                userShader.init( material );
+            if( config.init ) {
+                config.init( material );
                 material.needsUpdate = true;
             }
 
-            material.name = shaderName;
-
-            me.cache.push( material );
-
             return material;
+
         };
+
+    },
+
+    registerMirror: function( mirror ) {
+        this.mirror = mirror;
     },
 
     umap: {
@@ -80,11 +99,11 @@ var Shader = this.Shader = {
             match, mapped;
 
         while ( (match = regex.exec( src )) !== null ) {
-            mapped = $.extend( {}, this.umap[ match[ 2 ] ] );
+            mapped = _.extend( {}, this.umap[ match[ 2 ] ] );
 
             if( mapped.value && typeof mapped.value === 'function' ) {
                 mapped.value = mapped.value();
-            } else if( !( 'value' in mapped) ) {
+            } else if( !( 'value' in mapped ) ) {
                 mapped.value = null;
             }
 
