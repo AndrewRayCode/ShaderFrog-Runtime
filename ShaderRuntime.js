@@ -3,28 +3,27 @@
 var ShaderRuntime = this.ShaderRuntime = function() {};
 
 _.extend( ShaderRuntime.prototype, {
-    
-    add: function( shaderName, config ) {
 
-        var me = this,
-            src = config.fragment + '\n' + config.vertex,
-            typed = me.parseMembers( src ),
-            uniforms = _.clone( config.uniforms || {} ),
-            attributes = _.clone( config.attributes || {} );
+    _parseRawShader: function ( shader ) {
 
-        for( var key in config.uniforms ) {
+        var src = shader.fragmentShader + '\n' + shader.vertexShader,
+            typed = this.parseMembers( src ),
+            uniforms = _.clone( shader.uniforms || {} ),
+            attributes = _.clone( shader.attributes || {} );
+
+        for( var key in shader.uniforms ) {
 
             if( uniforms[ key ] === 'mirror' ) {
 
                 uniforms[ key ] = {
                     type: 't',
-                    value: me.mirror.renderTarget
+                    value: this.mirror.renderTarget
                 };
 
             } else {
 
                 uniforms[ key ] = {
-                    value: config.uniforms[ key ],
+                    value: shader.uniforms[ key ],
                     type: typed.uniforms[ key ].type
                 };
 
@@ -40,19 +39,41 @@ _.extend( ShaderRuntime.prototype, {
             value: new THREE.Vector3(0,0,0)
         };
 
-        var shaderData = {
+        return {
             uniforms: uniforms,
-            attributes: attributes,
-            fragmentShader: config.fragment,
-            vertexShader: config.vertex
+            attributes: attributes
         };
+
+    },
+    
+    add: function( shaderName, config ) {
+
+        var shaderData = _.extend( {
+            fragmentShader: config.fragmentShader,
+            vertexShader: config.vertexShader
+        }, this._parseRawShader( config ) );
 
         if( 'transparent' in config ) {
             shaderData.transparent = config.transparent;
         }
 
         shaderData.name = shaderName;
-        me.shaderTypes[ shaderName ] = shaderData;
+        this.shaderTypes[ shaderName ] = shaderData;
+
+    },
+
+    update: function( name, options ) {
+
+        var massagedOptions = _.extend( {}, options, this._parseRawShader( options ) );
+
+        _.extend( this.shaderTypes[ name ], massagedOptions );
+
+        var shader, x;
+
+        for( x = 0 ; shader = this.runningShaders[ x++ ]; ) {
+            _.extend( shader, massagedOptions );
+            shader.material.needsUpdate = true;
+        }
 
     },
 
@@ -140,15 +161,15 @@ _.extend( ShaderRuntime.prototype, {
     // Update global shader uniform values
     updateShaders: function( obj ) {
 
-        _.each( this.runningShaders, function( shader, name ) {
-            if( obj.uniforms ) {
-                for( var uniform in obj.uniforms ) {
-                    if( uniform in shader.material.uniforms ) {
-                        shader.material.uniforms[ uniform ].value = obj.uniforms[ uniform ];
-                    }
+        var shader, x;
+
+        for( x = 0 ; shader = this.runningShaders[ x++ ]; ) {
+            for( var uniform in obj.uniforms ) {
+                if( uniform in shader.material.uniforms ) {
+                    shader.material.uniforms[ uniform ].value = obj.uniforms[ uniform ];
                 }
             }
-        });
+        }
 
     },
 
