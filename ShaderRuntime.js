@@ -66,13 +66,17 @@ _.extend( ShaderRuntime.prototype, {
 
         var massagedOptions = _.extend( {}, options, this._parseRawShader( options ) );
 
+        console.log('updating ',this.shaderTypes[ name ], 'with ',massagedOptions);
+
         _.extend( this.shaderTypes[ name ], massagedOptions );
 
         var shader, x;
 
         for( x = 0 ; shader = this.runningShaders[ x++ ]; ) {
-            _.extend( shader, massagedOptions );
-            shader.material.needsUpdate = true;
+            if( shader.name === name ) {
+                _.extend( shader.material, massagedOptions );
+                shader.material.needsUpdate = true;
+            }
         }
 
     },
