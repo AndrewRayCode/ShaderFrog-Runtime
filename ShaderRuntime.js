@@ -66,8 +66,6 @@ _.extend( ShaderRuntime.prototype, {
 
         var massagedOptions = _.extend( {}, options, this._parseRawShader( options ) );
 
-        console.log('updating ',this.shaderTypes[ name ], 'with ',massagedOptions);
-
         _.extend( this.shaderTypes[ name ], massagedOptions );
 
         var shader, x;
