@@ -175,6 +175,10 @@ _.extend( ShaderRuntime.prototype, {
 
     },
 
+    getRunningShader: function( name ) {
+        return _.findWhere( this.runningShaders, { name: name });
+    },
+
     shaderTypes: {},
 
     runningShaders: []
