@@ -1,0 +1,28 @@
+{
+  "name": "shaderfrog-runtime",
+  "version": "1.0.0",
+  "description": "ShaderFrog runtime library",
+  "main": "ShaderRuntime.js",
+  "scripts": {
+    "build": "NODE_ENV=production webpack --progress --config webpack.config.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/DelvarWorld/ShaderFrog-Runtime.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DelvarWorld/ShaderFrog-Runtime/issues"
+  },
+  "homepage": "https://github.com/DelvarWorld/ShaderFrog-Runtime#readme",
+  "dependencies": {
+    "babel": "^5.8.21",
+    "babel-core": "^5.8.21",
+    "babel-loader": "^5.3.2",
+    "three": "^0.71.0",
+    "webpack": "^1.11.0",
+    "webpack-notifier": "^1.2.1"
+  }
+}

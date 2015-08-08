@@ -1,0 +1,34 @@
+{
+  "ecmaFeatures": {
+    "jsx": true,
+    "modules": true
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true
+  },
+  "rules": {
+    "camelcase": 0,
+    "consistent-return": 0,
+    "strict": 0,
+    "no-underscore-dangle": 0,
+    "no-unused-vars": 0,
+    "no-unused-expressions": 0,
+    "no-return-assign": 0, // for return ( fn = cond )
+    "no-cond-assign": 0, // for shorthand for(;x = y[z++]) loops
+    "no-multi-spaces": 0,
+    "quotes": [ 2 ],
+    "new-cap": 0,
+    "comma-spacing": 0,
+    "no-use-before-define": 0,
+    "curly": 0,
+    "no-trailing-spaces": 0
+  },
+  "plugins": [
+    "react"
+  ],
+  "globals": {
+    "app": true
+  }
+}
