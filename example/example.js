@@ -1,15 +1,31 @@
-var camera, cubeCamera, scene, renderer, geometry, mesh, cubeCamera, leftSphere, rightSphere;
+var camera, cubeCamera, scene, renderer, meshTop, meshBottom, cubeCamera, leftSphere, rightSphere;
 
 var runtime = new ShaderFrogRuntime();
 
 var clock = new THREE.Clock();
 
-// shaderfrog loading
-runtime.load( 'http://andrewray.me/stuff/Reflection_Cube_Map.json', function( shaderData ) {
-    var material = runtime.get( shaderData.name );
-    mesh.material = material;
-    material.uniforms.reflectionSampler.value = cubeCamera.renderTarget;
-    material.needsUpdate = true;
+// Load multiple ShaderFrog shaders
+runtime.load([
+    'http://andrewray.me/stuff/Reflection_Cube_Map.json',
+    'http://andrewray.me/stuff/Water_or_Oil.json'
+], function( shaders ) {
+
+    // `shaders` will be an array with the material data in the same order you
+    // specified when calling `load
+
+    // Get the Three.js material you can assign to your objects
+    // ShaderFrog shader 1 (reflection effect)
+    var materialTop = runtime.get( shaders[ 0 ].name );
+
+    // You set uniforms the same way as a regular THREE.js shader. In this
+    // case, the shader uses a cube camera for reflection, so we have to set
+    // its value to the renderTarget of a cubeCamera we create
+    materialTop.uniforms.reflectionSampler.value = cubeCamera.renderTarget;
+    meshTop.material = materialTop;
+
+    // ShaderFrog shader 2 (oily effect)
+    var materialBottom = runtime.get( shaders[ 1 ].name );
+    meshBottom.material = materialBottom;
 });
 
 init();
@@ -29,9 +45,16 @@ function init() {
     scene.add( cubeCamera );
 
     // Main object
-    geometry = new THREE.SphereGeometry( 20, 10, 10 );
-    mesh = new THREE.Mesh( geometry );
-    scene.add( mesh );
+    var topGeometry = new THREE.SphereGeometry( 20, 10, 10 );
+    meshTop = new THREE.Mesh( topGeometry );
+    meshTop.position.y = 20;
+    scene.add( meshTop );
+
+    // Second main object
+    var bottomGeometry = new THREE.SphereGeometry( 20, 10, 10 );
+    meshBottom = new THREE.Mesh( bottomGeometry );
+    meshBottom.position.y = -20;
+    scene.add( meshBottom );
 
     // Decorative objects
     var other = new THREE.SphereGeometry( 10, 20, 50, 50 );
@@ -78,8 +101,8 @@ function animate() {
 
 function render() {
 
-    mesh.rotation.x += 0.01;
-    mesh.rotation.y += 0.02;
+    meshTop.rotation.x += 0.01;
+    meshTop.rotation.y += 0.02;
 
     var time = clock.getElapsedTime();
 
@@ -88,10 +111,23 @@ function render() {
     leftSphere.position.y = 40 * Math.sin( new Date() * 0.001 );
     rightSphere.position.y = -40 * Math.sin( new Date() * 0.001 );
 
-    mesh.visible = false;
+    meshTop.visible = false;
     cubeCamera.updateCubeMap( renderer, scene );
-    mesh.visible = true;
+    meshTop.visible = true;
     
     renderer.render( scene, camera );
 
 }
+
+
+function onWindowResize() {
+
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+}
+
+window.addEventListener('resize', onWindowResize, false);
+

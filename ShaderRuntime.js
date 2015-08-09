@@ -24,20 +24,43 @@ ShaderRuntime.prototype = {
         sampler2D: { type: 't' }
     },
 
-    load: function( source, callback ) {
+    load: function( sourceOrSources, callback ) {
 
-        let loader = new THREE.XHRLoader();
-        loader.load( 'http://andrewray.me/stuff/Reflection_Cube_Map.json', ( json ) => {
-            let parsed;
-            try {
-                parsed = JSON.parse( json );
-                delete parsed.id; // Errors if passed to rawshadermaterial :(
-            } catch( e ) {
-                throw new Error( 'Could not parse this shader! Please verify the URL is correct.' );
-            }
-            this.add( parsed.name, parsed );
-            callback( parsed );
-        });
+        let sources = sourceOrSources,
+            onlyOneSource = typeof sourceOrSources === 'string';
+
+        if( onlyOneSource ) {
+            sources = [ sourceOrSources ];
+        }
+
+        let loadedShaders = new Array( sources.length ),
+            itemsLoaded = 0;
+
+        let loadSource = ( index, source ) => {
+
+            let loader = new THREE.XHRLoader();
+            loader.load( source, ( json ) => {
+
+                let parsed;
+                try {
+                    parsed = JSON.parse( json );
+                    delete parsed.id; // Errors if passed to rawshadermaterial :(
+                } catch( e ) {
+                    throw new Error( 'Could not parse shader' + source + '! Please verify the URL is correct.' );
+                }
+                this.add( parsed.name, parsed );
+                loadedShaders[ index ] = parsed;
+
+                if( ++itemsLoaded === sources.length ) {
+                    callback( onlyOneSource ? loadedShaders[ 0 ] : loadedShaders );
+                }
+
+            });
+        };
+
+        for( let x = 0; x < sources.length; x++ ) {
+            loadSource( x, sources[ x ] );
+        }
 
     },
 
@@ -325,6 +348,7 @@ ShaderRuntime.prototype = {
 
 };
 
+// Convenience methods so we don't have to include underscore
 function extend() {
     let length = arguments.length,
         obj = arguments[ 0 ];

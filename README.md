@@ -10,6 +10,8 @@ This is a utility library to load and update [ShaderFrog.com](http://shaderfrog.
 
 ## Usage
 
+A full example can be found in the [example/](https://github.com/DelvarWorld/ShaderFrog-Runtime/tree/master/example) folder.
+
 Download the [built Javascript file](http://shaderfrog.com/shaderfrog-runtime.min.js) and include it in your project *after* THREE.js:
 
     <script src="shaderfrog-runtime.min.js"></script>
@@ -17,6 +19,65 @@ Download the [built Javascript file](http://shaderfrog.com/shaderfrog-runtime.mi
 Instantiate a new runtime:
 
     var runtime = new ShaderFrogRuntime();
+
+Instantiate a new clock:
+
+    var clock = new THREE.Clock();
+
+Load your desired shader, and assign it to a material:
+
+    runtime.load( 'Your_Shader.json', function( shaderData ) {
+
+        // Get the Three.js material you can assign to your objects
+        var material = runtime.get( shaderData.name );
+
+        // Assign it to your objects
+        mesh.material = material;
+    });
+
+In your initialization code, register the main camera, which is the one that you call `renderer.render( scene, camera )` with:
+
+    runtime.registerCamera( camera );
+
+This tells the ShaderFrog runtime how to update the `cameraPosition` uniform, which some shaders use to calculate things based on the camera, like reflection.
+
+In your animation loop, update the running shaders that the ShaderFrog runtime knows about:
+
+    runtime.updateShaders( clock.getElapsedTime() );
+
+A full example can be found in the [example/](https://github.com/DelvarWorld/ShaderFrog-Runtime/tree/master/example) folder.
+
+## API
+
+**Warning:** This API is volatile and subject to change in future versions.
+
+#### `runtime.registerCamera( THREE.Camera camera )`
+
+Tells the runtime to use this camera's position for the default `cameraPosition` uniform. This uniform is normally passed by  default in THREE.js to shader materials, but ShaderFrog shaders use the RawSahderMaterial class.
+
+#### `runtime.updateShaders( Float time )`
+
+Update uniform values for shaders, specifically `float time`, `vec3 cameraPosition`, and `mat4 viewMatrix`. The only uniform the runtime cannot define is `time` which should be provided by the elapsed time in milliseconds. [THREE.Clock.getElapsedTime()](http://threejs.org/docs/#Reference/Core/Clock) provies this value.
+
+#### `runtime.load( [ String source | Array sources ], Function callback )`
+
+Call this function with either:
+
+    runtime.load( 'material.json', function( material ) ) {
+        var shader = runtime.get( material.name ); ...
+    }
+
+...for one material, or...
+
+    runtime.load( [  'material1.json', 'material2.json' ], function( materials ) ) {
+        var shader = runtime.get( materials[ 0 ].name ); ...
+    }
+
+Load the specified URLs and parse them into materials. If you pass in an array of URLs, the callback receives an array of materials in the same order you specified.
+
+#### `runtime.get( String name )`
+
+The ShaderFrog stores materials by name. This function returns a **new instance** of the material you have loaded. You can assign this new material to your object, update uniforms on it, etc.
 
 ## Development
 
