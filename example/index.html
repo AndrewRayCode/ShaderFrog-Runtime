@@ -2,15 +2,85 @@
     <head>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r71/three.js" charSet="utf-8"></script>
         <script src="../shaderfrog-runtime.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rainbow/1.2.0/themes/twilight.min.css">
         <style>
             html, body {
                 margin:0;
                 padding:0;
+                background: #333;
+                color:#fff;
+                font-family:sans-serif;
+                font-size:16px;
+            }
+
+            a, a:visited {
+                color:#aee239;
+                text-decoration:underline;
+            }
+
+            h1 a {
+                text-decoration:none;
+            }
+
+            #canvas {
+                box-shadow:0 0 10px #111;
+                width: 800px;
+                height: 600px;
+                margin:20px auto;
+            }
+
+            .wrap {
+                text-shadow: 1px 1px 0 #000;
+                width:800;
+                margin: 10px auto;
+            }
+
+            pre {
+                text-align:left;
+                background:#1a1a1a;
+                font-size:16px;
+                color:#fff;
+                padding:20px;
+                border-radius:4px;
+                box-shadow:inset 0 0 20px #000;
             }
         </style>
     </head>
     <body>
-        <div id="canvas"></div>
+        <div class="wrap">
+            <h1><a href="http://shaderfrog.com/" target="_blank">ShaderFrog.com</a> Runtime Demo</h1>
+            Runtime demo for <a href="http://shaderfrog.com/" target="_blank">ShaderFrog.com</a> online WebGL shader editor. View source of this page or see <a href="example.js">example.js</a>.
+            <br /><br />Repository: <a href="https://github.com/DelvarWorld/ShaderFrog-Runtime" target="_blank">Github source</a>
+            <div id="canvas"></div>
+
+            <h2>Relevant Source</h2>
+            <pre><code data-language="javascript">// Load multiple ShaderFrog shaders
+runtime.load([
+    'http://andrewray.me/stuff/Reflection_Cube_Map.json',
+    'http://andrewray.me/stuff/Water_or_Oil.json'
+], function( shaders ) {
+
+    // `shaders` will be an array with the material data in the same order you
+    // specified when calling `load
+
+    // Get the Three.js material you can assign to your objects
+    // ShaderFrog shader 1 (reflection effect)
+    var materialTop = runtime.get( shaders[ 0 ].name );
+
+    // You set uniforms the same way as a regular THREE.js shader. In this
+    // case, the shader uses a cube camera for reflection, so we have to set
+    // its value to the renderTarget of a cubeCamera we create
+    materialTop.uniforms.reflectionSampler.value = cubeCamera.renderTarget;
+    meshTop.material = materialTop;
+
+    // ShaderFrog shader 2 (oily effect)
+    var materialBottom = runtime.get( shaders[ 1 ].name );
+    meshBottom.material = materialBottom;
+});</code></pre>
+        </div>
     </body>
     <script src="example.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rainbow/1.2.0/js/rainbow.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rainbow/1.2.0/js/language/generic.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rainbow/1.2.0/js/language/javascript.min.js"></script>
 </html>

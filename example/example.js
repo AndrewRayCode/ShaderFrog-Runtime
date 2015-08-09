@@ -1,8 +1,7 @@
-var camera, cubeCamera, scene, renderer, meshTop, meshBottom, cubeCamera, leftSphere, rightSphere;
-
-var runtime = new ShaderFrogRuntime();
-
-var clock = new THREE.Clock();
+var runtime = new ShaderFrogRuntime(),
+    width = 800, height = 600,
+    clock = new THREE.Clock(),
+    camera, cubeCamera, scene, renderer, meshTop, meshBottom, cubeCamera, leftSphere, rightSphere;
 
 // Load multiple ShaderFrog shaders
 runtime.load([
@@ -36,7 +35,7 @@ function init() {
     scene = new THREE.Scene();
 
     // Cameras
-    camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+    camera = new THREE.PerspectiveCamera( 50, width / height, 1, 10000 );
     camera.position.z = 100;
     scene.add( camera );
     runtime.registerCamera( camera );
@@ -86,9 +85,9 @@ function init() {
     scene.add(rightSphere);
 
     renderer = new THREE.WebGLRenderer();
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setSize( width, height );
 
-    document.body.appendChild( renderer.domElement );
+    document.getElementById( 'canvas' ).appendChild( renderer.domElement );
 
 }
 
@@ -118,16 +117,3 @@ function render() {
     renderer.render( scene, camera );
 
 }
-
-
-function onWindowResize() {
-
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-
-    renderer.setSize(window.innerWidth, window.innerHeight);
-
-}
-
-window.addEventListener('resize', onWindowResize, false);
-
