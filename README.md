@@ -81,7 +81,7 @@ Load the specified URLs and parse them into materials. If you pass in an array o
 
 #### `runtime.get( String name )`
 
-The ShaderFrog stores materials by name. This function returns a **new instance** of the material you have loaded. You can assign this new material to your object, update uniforms on it, etc.
+The ShaderFrog runtime stores materials by name. This function returns a **new instance** of the material you have loaded. You can assign this new material to your object, update uniforms on it, etc.
 
 ## Development
 
