@@ -7,9 +7,9 @@ var config = {
         runtime: './ShaderRuntime.js'
     },
     output: {
-        path: path.join(__dirname, 'public/'),
         filename: 'shaderfrog-runtime.min.js',
-        publicPath: 'http://s3-us-west-1.amazonaws.com/shader-frog/'
+        library: 'ShaderFrogRuntime',
+        libraryTarget: 'var'
     },
     resolveLoader: {
         root: path.join(__dirname, 'scripts/loaders')
@@ -21,7 +21,8 @@ var config = {
         }]
     },
     externals: {
-        THREE: 'THREE'
+        THREE: 'THREE',
+        three: 'THREE'
     },
     plugins: [
         new webpack.NoErrorsPlugin(),

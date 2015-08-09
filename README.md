@@ -10,9 +10,13 @@ This is a utility library to load and update [ShaderFrog.com](http://shaderfrog.
 
 ## Usage
 
-Download the [built Javascript file](http://shaderfrog.com/) and include it in your project *after* THREE.js:
+Download the [built Javascript file](http://shaderfrog.com/shaderfrog-runtime.min.js) and include it in your project *after* THREE.js:
 
     <script src="shaderfrog-runtime.min.js"></script>
+
+Instantiate a new runtime:
+
+    var runtime = new ShaderFrogRuntime();
 
 ## Development
 

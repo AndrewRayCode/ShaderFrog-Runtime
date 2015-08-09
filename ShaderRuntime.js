@@ -1,6 +1,11 @@
 import THREE from 'three';
 
-var ShaderRuntime = module.exports = function() {};
+let ShaderRuntime = module.exports = function() {};
+
+let defaultThreeUniforms = [
+    'normalMatrix', 'viewMatrix', 'projectionMatrix', 'position', 'normal',
+    'modelViewMatrix', 'uv', 'uv2', 'modelMatrix'
+];
 
 ShaderRuntime.prototype = {
 
@@ -21,22 +26,30 @@ ShaderRuntime.prototype = {
 
     load: function( source, callback ) {
 
-        var loader = new THREE.XHRLoader();
-        loader.load( 'http://andrewray.me/stuff/Reflection_Cube_Map.json', function( json ) {
-            this.add( json.name, json );
+        let loader = new THREE.XHRLoader();
+        loader.load( 'http://andrewray.me/stuff/Reflection_Cube_Map.json', ( json ) => {
+            let parsed;
+            try {
+                parsed = JSON.parse( json );
+                delete parsed.id; // Errors if passed to rawshadermaterial :(
+            } catch( e ) {
+                throw new Error( 'Could not parse this shader! Please verify the URL is correct.' );
+            }
+            this.add( parsed.name, parsed );
+            callback( parsed );
         });
 
     },
 
     _parseRawShader: function( shader ) {
 
-        var src = shader.fragmentShader + '\n' + shader.vertexShader,
+        let src = shader.fragmentShader + '\n' + shader.vertexShader,
             typed = this.parseMembers( src ),
             uniforms = clone( shader.uniforms || {} ),
             attributes = clone( shader.attributes || {} ),
             camera;
 
-        for( var key in shader.uniforms ) {
+        for( let key in shader.uniforms ) {
 
             if( typeof uniforms[ key ] === 'string' ) {
 
@@ -83,29 +96,20 @@ ShaderRuntime.prototype = {
     
     add: function( shaderName, config ) {
 
-        var shaderData = extend({
-            fragmentShader: config.fragmentShader,
-            vertexShader: config.vertexShader
-        }, this._parseRawShader( config ) );
-
-        if( 'transparent' in config ) {
-            shaderData.transparent = config.transparent;
-        }
-
-        shaderData.name = shaderName;
-        this.shaderTypes[ shaderName ] = shaderData;
+        let newData = clone( config );
+        newData.fragmentShader = config.fragment;
+        newData.vertexShader = config.vertex;
+        delete newData.fragment;
+        delete newData.vertex;
+        this.shaderTypes[ config.name ] = newData;
 
     },
 
     updateRuntime: function( name, data ) {
 
-        try {
         this.shaderTypes[ name ].uniforms = data.uniforms;
-        } catch( e) {
-            //debugger;
-        }
 
-        var shader, x, uniformName, uniform;
+        let shader, x, uniformName, uniform;
 
         // This loop does not appear to be a slowdown culprit
         for( x = 0; shader = this.runningShaders[ x++ ]; ) {
@@ -137,7 +141,7 @@ ShaderRuntime.prototype = {
 
     renameShader: function( oldName, newName ) {
 
-        var x, shader;
+        let x, shader;
 
         if( !( oldName in this.shaderTypes ) ) {
             throw new Error("Could not rename shader that doesn't exist.");
@@ -160,11 +164,11 @@ ShaderRuntime.prototype = {
             throw new Error( 'Runtime Error: Cannot update shader ' + name + ' because it has not been added.');
         }
 
-        var massagedOptions = extend( {}, config, this._parseRawShader( config ) );
+        let massagedOptions = extend( {}, config, this._parseRawShader( config ) );
 
         extend( this.shaderTypes[ name ], massagedOptions );
 
-        var shader, x;
+        let shader, x;
 
         for( x = 0; shader = this.runningShaders[ x++ ]; ) {
             if( shader.name === name ) {
@@ -177,7 +181,7 @@ ShaderRuntime.prototype = {
 
     get: function( name ) {
 
-        var shaderType = this.shaderTypes[ name ];
+        let shaderType = this.shaderTypes[ name ];
 
         if( !shaderType.initted ) {
 
@@ -190,7 +194,7 @@ ShaderRuntime.prototype = {
 
     create: function( name ) {
 
-        var shaderType = this.shaderTypes[ name ];
+        let shaderType = this.shaderTypes[ name ];
 
         shaderType.material = new THREE.RawShaderMaterial( shaderType );
 
@@ -244,7 +248,7 @@ ShaderRuntime.prototype = {
     },
 
     parseMembers: function( src ) {
-        var regex = /\s*(uniform|attribute)\s+(\w+)\s+(\w+)\s*;/gm,
+        let regex = /\s*(uniform|attribute)\s+(\w+)\s+(\w+)\s*;/gm,
             expandedSrc = src.replace(/;g/, ';\n' ),
             members = {
                 uniforms: {},
@@ -281,13 +285,13 @@ ShaderRuntime.prototype = {
     // Update global shader uniform values
     updateShaders: function( time, obj ) {
 
-        var shader, x;
+        let shader, x;
 
         obj = obj || {};
 
         for( x = 0; shader = this.runningShaders[ x++ ]; ) {
 
-            for( var uniform in obj.uniforms ) {
+            for( let uniform in obj.uniforms ) {
                 if( uniform in shader.material.uniforms ) {
                     shader.material.uniforms[ uniform ].value = obj.uniforms[ uniform ];
                 }
@@ -322,19 +326,19 @@ ShaderRuntime.prototype = {
 };
 
 function extend() {
-    var length = arguments.length,
-        obj = {};
+    let length = arguments.length,
+        obj = arguments[ 0 ];
 
-    if( length < 2  ) {
+    if( length < 2 ) {
         return obj;
     }
 
-    for( var index = 1; index < length; index++ ) {
-        var source = arguments[ index ],
-            keys = Object.keys( source ),
+    for( let index = 1; index < length; index++ ) {
+        let source = arguments[ index ],
+            keys = Object.keys( source || {} ),
             l = keys.length;
-        for( var i = 0; i < l; i++ ) {
-            var key = keys[i];
+        for( let i = 0; i < l; i++ ) {
+            let key = keys[i];
             if( obj[ key ] === void 0 ) obj[ key ] = source[ key ];
         }
     }
@@ -346,6 +350,4 @@ function clone( obj ) {
     return extend( {}, obj );
 }
 
-if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-    module.exports = ShaderRuntime;
-}
+export default ShaderRuntime;
