@@ -8,9 +8,13 @@
 
 This is a utility library to load and update [ShaderFrog.com](http://shaderfrog.com) shaders into your THREE.js scene or application.
 
-## Usage
+## Demo
 
-A full example can be found in the [example/](https://github.com/DelvarWorld/ShaderFrog-Runtime/tree/master/example) folder.
+[**Online Demo**](http://andrewray.me/ShaderFrog-Runtime/example/index.html)
+
+Demo source found in the [example/](https://github.com/DelvarWorld/ShaderFrog-Runtime/tree/master/example) folder.
+
+## Usage
 
 Download the [built Javascript file](http://shaderfrog.com/shaderfrog-runtime.min.js) and include it in your project *after* THREE.js:
 
