@@ -1,6 +1,6 @@
 import THREE from 'three';
 
-let ShaderRuntime = module.exports = function() {};
+let ShaderRuntime = function() {};
 
 let defaultThreeUniforms = [
     'normalMatrix', 'viewMatrix', 'projectionMatrix', 'position', 'normal',
