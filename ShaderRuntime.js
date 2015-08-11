@@ -1,6 +1,6 @@
 import THREE from 'three';
 
-let ShaderRuntime = function() {};
+function ShaderRuntime() {}
 
 let defaultThreeUniforms = [
     'normalMatrix', 'viewMatrix', 'projectionMatrix', 'position', 'normal',
@@ -17,14 +17,19 @@ ShaderRuntime.prototype = {
     umap: {
         float: { type: 'f', value: 0 },
         int: { type: 'i', value: 0 },
-        vec2: { type: 'v2', value: function() { return new THREE.Vector2(); } },
-        vec3: { type: 'v3', value: function() { return new THREE.Vector3(); } },
-        vec4: { type: 'v4', value: function() { return new THREE.Vector4(); } },
+        vec2: { type: 'v2', value() { return new THREE.Vector2(); } },
+        vec3: { type: 'v3', value() { return new THREE.Vector3(); } },
+        vec4: { type: 'v4', value() { return new THREE.Vector4(); } },
         samplerCube: { type: 't' },
         sampler2D: { type: 't' }
     },
 
-    load: function( sourceOrSources, callback ) {
+    getUmap( type ) {
+        let value = this.umap[ type ].value;
+        return typeof value === 'function' ? value() : value;
+    },
+
+    load( sourceOrSources, callback ) {
 
         let sources = sourceOrSources,
             onlyOneSource = typeof sourceOrSources === 'string';
@@ -64,79 +69,149 @@ ShaderRuntime.prototype = {
 
     },
 
-    _parseRawShader: function( shader ) {
+    registerCamera( camera ) {
 
-        let src = shader.fragmentShader + '\n' + shader.vertexShader,
-            typed = this.parseMembers( src ),
-            uniforms = clone( shader.uniforms || {} ),
-            attributes = clone( shader.attributes || {} ),
-            camera;
+        if( !( camera instanceof THREE.Camera ) ) {
+            throw new Error( 'Cannot register a non-camera as a camera!' );
+        }
 
-        for( let key in shader.uniforms ) {
+        this.mainCamera = camera;
 
-            if( typeof uniforms[ key ] === 'string' ) {
+    },
 
-                if( !( camera = ( this.cubeCameras[ key ] || this.mainCamera ) ) ) {
-                    throw new Error( 'Camera not found: ' + uniforms[ key ] );
-                }
+    registerCubeCamera( name, camera ) {
 
-                uniforms[ key ] = {
-                    type: 't',
-                    value: camera.renderTarget
-                };
+        if( !camera.renderTarget ) {
+            throw new Error( 'Cannot register a non-camera as a camera!' );
+        }
 
-            } else {
+        this.cubeCameras[ name ] = camera;
 
-                if( !typed.uniforms[ key ] ) {
-                    console.warn( 'Tried to parse a shader but did not find key: ',key,' in ',typed.uniforms,shader );
-                }
+    },
 
-                uniforms[ key ] = shader.uniforms[ key ];
-                //{
-                //    value: shader.uniforms[ key ],
-                //    type: typed.uniforms[ key ].type
-                //};
+    unregisterCamera( name ) {
 
-                if( uniforms[ key ].value instanceof THREE.Color ) {
-                    uniforms[ key ].type = 'c';
-                }
+        if( name in this.cubeCameras ) {
 
+            delete this.cubeCameras[ name ];
+            
+        } else if( name === this.mainCamera ) {
+
+            delete this.mainCamera;
+
+        } else {
+
+            throw new Error( 'You never registered camera ' + name );
+
+        }
+
+    },
+
+    updateSource( identifier, config, findBy ) {
+
+        findBy = findBy || 'name';
+
+        if( !this.shaderTypes[ identifier ] ) {
+            throw new Error( 'Runtime Error: Cannot update shader ' + identifier + ' because it has not been added.' );
+        }
+
+        let newShaderData = this.add( identifier, config ),
+            shader, x;
+
+        for( x = 0; shader = this.runningShaders[ x++ ]; ) {
+            if( shader[ findBy ] === identifier ) {
+                extend( shader.material, omit( newShaderData, 'id' ) );
+                shader.material.needsUpdate = true;
             }
         }
 
-        uniforms.cameraPosition = {
-            type: 'v3',
-            value: new THREE.Vector3( 0, 0, 0 )
-        };
+    },
 
-        // Copy the entire shader for things like side in the config
-        return extend( clone( shader ), {
-            uniforms: uniforms,
-            attributes: attributes
-        } );
+    renameShader( oldName, newName ) {
+
+        let x, shader;
+
+        if( !( oldName in this.shaderTypes ) ) {
+            throw new Error('Could not rename shader ' + oldName + ' to ' + newName + '. It does not exist.');
+        }
+
+        this.shaderTypes[ newName ] = this.shaderTypes[ oldName ];
+        delete this.shaderTypes[ oldName ];
+
+        for( x = 0; shader = this.runningShaders[ x++ ]; ) {
+            if( shader.name === oldName ) {
+                shader.name = newName;
+            }
+        }
 
     },
-    
-    add: function( shaderName, config ) {
 
-        let newData = clone( config );
+    get( identifier ) {
+
+        let shaderType = this.shaderTypes[ identifier ];
+
+        if( !shaderType.initted ) {
+
+            this.create( identifier );
+        }
+
+        return shaderType.material;
+
+    },
+
+    add( shaderName, config ) {
+
+        let newData = clone( config ),
+            uniform;
         newData.fragmentShader = config.fragment;
         newData.vertexShader = config.vertex;
         delete newData.fragment;
         delete newData.vertex;
-        this.shaderTypes[ config.name ] = newData;
+
+        for( var uniformName in newData.uniforms ) {
+            uniform = newData.uniforms[ uniformName ];
+            if( uniform.value === null ) {
+                newData.uniforms[ uniformName ].value = this.getUmap( uniform.glslType );
+            }
+        }
+        
+        if( shaderName in this.shaderTypes ) {
+            // maybe not needed? too sleepy, need document
+            extend( this.shaderTypes[ shaderName ], newData );
+        } else {
+            this.shaderTypes[ shaderName ] = newData;
+        }
+
+        return newData;
 
     },
 
-    updateRuntime: function( name, data ) {
+    create( identifier ) {
 
-        this.shaderTypes[ name ].uniforms = data.uniforms;
+        let shaderType = this.shaderTypes[ identifier ];
+
+        shaderType.material = new THREE.RawShaderMaterial( shaderType );
+
+        this.runningShaders.push( shaderType );
+
+        shaderType.init && shaderType.init( shaderType.material );
+        shaderType.material.needsUpdate = true;
+
+        shaderType.initted = true;
+
+        return shaderType.material;
+
+    },
+
+    updateRuntime( identifier, data, findBy ) {
+
+        findBy = findBy || 'name';
 
         let shader, x, uniformName, uniform;
 
         // This loop does not appear to be a slowdown culprit
         for( x = 0; shader = this.runningShaders[ x++ ]; ) {
-            if( shader.name === name ) {
+            if( shader[ findBy ] === identifier ) {
                 for( uniformName in data.uniforms ) {
 
                     if( uniformName in this.reserved ) {
@@ -162,151 +237,8 @@ ShaderRuntime.prototype = {
 
     },
 
-    renameShader: function( oldName, newName ) {
-
-        let x, shader;
-
-        if( !( oldName in this.shaderTypes ) ) {
-            throw new Error("Could not rename shader that doesn't exist.");
-        }
-
-        this.shaderTypes[ newName ] = this.shaderTypes[ oldName ];
-        delete this.shaderTypes[ oldName ];
-
-        for( x = 0; shader = this.runningShaders[ x++ ]; ) {
-            if( shader.name === oldName ) {
-                shader.name = newName;
-            }
-        }
-
-    },
-
-    updateSource: function( name, config ) {
-
-        if( !this.shaderTypes[ name ] ) {
-            throw new Error( 'Runtime Error: Cannot update shader ' + name + ' because it has not been added.');
-        }
-
-        let massagedOptions = extend( {}, config, this._parseRawShader( config ) );
-
-        extend( this.shaderTypes[ name ], massagedOptions );
-
-        let shader, x;
-
-        for( x = 0; shader = this.runningShaders[ x++ ]; ) {
-            if( shader.name === name ) {
-                extend( shader.material, massagedOptions );
-                shader.material.needsUpdate = true;
-            }
-        }
-
-    },
-
-    get: function( name ) {
-
-        let shaderType = this.shaderTypes[ name ];
-
-        if( !shaderType.initted ) {
-
-            this.create( name );
-        }
-
-        return shaderType.material;
-
-    },
-
-    create: function( name ) {
-
-        let shaderType = this.shaderTypes[ name ];
-
-        shaderType.material = new THREE.RawShaderMaterial( shaderType );
-
-        this.runningShaders.push( shaderType );
-
-        shaderType.init && shaderType.init( shaderType.material );
-        shaderType.material.needsUpdate = true;
-
-        shaderType.initted = true;
-
-        return shaderType.material;
-
-    },
-
-    registerCamera: function( camera ) {
-
-        if( !( camera instanceof THREE.Camera ) ) {
-            throw new Error( 'Cannot register a non-camera as a camera!' );
-        }
-
-        this.mainCamera = camera;
-
-    },
-
-    registerCubeCamera: function( name, camera ) {
-
-        if( !camera.renderTarget ) {
-            throw new Error( 'Cannot register a non-camera as a camera!' );
-        }
-
-        this.cubeCameras[ name ] = camera;
-
-    },
-
-    unregisterCamera: function( name ) {
-
-        if( name in this.cubeCameras ) {
-
-            delete this.cubeCameras[ name ];
-            
-        } else if( name === this.mainCamera ) {
-
-            delete this.mainCamera;
-
-        } else {
-
-            throw new Error( 'You never registered camera ' + name );
-
-        }
-
-    },
-
-    parseMembers: function( src ) {
-        let regex = /\s*(uniform|attribute)\s+(\w+)\s+(\w+)\s*;/gm,
-            expandedSrc = src.replace(/;g/, ';\n' ),
-            members = {
-                uniforms: {},
-                attributes: {}
-            },
-            match, mapped;
-
-        while ( (match = regex.exec( expandedSrc )) !== null ) {
-            mapped = extend( {}, this.umap[ match[ 2 ] ] );
-
-            if( mapped.value && typeof mapped.value === 'function' ) {
-                mapped.value = mapped.value();
-            } else if( !( 'value' in mapped ) ) {
-                mapped.value = null;
-            }
-
-            members[ match[ 1 ] + 's' ][ match[ 3 ] ] = mapped;
-        }
-
-        // Defaults
-        members.uniforms.mouse = {
-            value: new THREE.Vector2( 10, 10 ),
-            type: 'v2'
-        };
-
-        members.uniforms.opacity = {
-            type: 'f',
-            value: 1
-        };
-
-        return members;
-    },
-
     // Update global shader uniform values
-    updateShaders: function( time, obj ) {
+    updateShaders( time, obj ) {
 
         let shader, x;
 
@@ -363,7 +295,7 @@ function extend() {
             l = keys.length;
         for( let i = 0; i < l; i++ ) {
             let key = keys[i];
-            if( obj[ key ] === void 0 ) obj[ key ] = source[ key ];
+            obj[ key ] = source[ key ];
         }
     }
 
@@ -372,6 +304,14 @@ function extend() {
 
 function clone( obj ) {
     return extend( {}, obj );
+}
+
+function omit( obj, ...keys ) {
+    let cloned = clone( obj ), x, key;
+    for( x = 0; key = keys[ x++ ]; ) {
+        delete cloned[ key ];
+    }
+    return cloned;
 }
 
 export default ShaderRuntime;
