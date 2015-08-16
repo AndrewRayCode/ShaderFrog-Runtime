@@ -1,0 +1,73 @@
+{
+  "id": 40,
+  "name": "Water or Oil",
+  "fragment": "// http://glslsandbox.com/e#11554.0\n\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nuniform float time;\n\nvarying vec2 vUv;\nvarying vec3 vPosition;\nvarying vec3 vNormal;\n\nuniform vec3 color1;\nuniform vec3 color2;\nuniform vec3 color3;\nuniform vec3 color4;\n\n// by @301z\n\nfloat rand(vec2 n) { \n\treturn fract(cos(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);\n}\n\nfloat noise(vec2 n) {\n\tconst vec2 d = vec2(0.0, 1.0);\n\tvec2 b = floor(n), f = smoothstep(vec2(0.0), vec2(1.0), fract(n));\n\treturn mix(mix(rand(b), rand(b + d.yx), f.x), mix(rand(b + d.xy), rand(b + d.yy), f.x), f.y);\n}\n\nfloat fbm(vec2 n) {\n\tfloat total = 0.0, amplitude = 1.0;\n\tfor (int i = 0; i < 7; i++) {\n\t\ttotal += noise(n) * amplitude;\n\t\tn += n;\n\t\tamplitude *= 0.5;\n\t}\n\treturn total;\n}\n\nvoid main() {\n\tconst vec3 c5 = vec3(0.1);\n\tconst vec3 c6 = vec3(0.9);\n\tvec2 p = vUv.xy * 8.0;\n\tfloat q = fbm(p - time * 0.1);\n\tvec2 r = vec2(fbm(p + q + time * 0.7 - p.x - p.y), fbm(p + q - time * 0.4));\n\tvec3 c = mix(color1, color2, fbm(p + r)) +\n\t    mix(color3, color4, r.x) - mix(c5, c6, r.y);\n\tgl_FragColor = vec4(c * cos(1.57 * vUv.y), 1.0);\n}\n",
+  "vertex": "precision highp float;\r\nprecision highp int;\r\n\r\nuniform mat4 modelMatrix;\r\nuniform mat4 modelViewMatrix;\r\nuniform mat4 projectionMatrix;\r\nuniform mat4 viewMatrix;\r\nuniform mat3 normalMatrix;\r\n\r\nattribute vec3 position;\r\nattribute vec3 normal;\r\nattribute vec2 uv;\r\nattribute vec2 uv2;\r\n\r\nvarying vec2 vUv;\r\nvarying vec3 vPosition;\r\nvarying vec3 vNormal;\r\n\r\nvoid main() {\r\n  vUv = uv;\r\n  vPosition = position;\r\n  vNormal = normal;\r\n  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\r\n}",
+  "uniforms": {
+    "time": {
+      "type": "f",
+      "glslType": "float",
+      "description": "",
+      "textureId": null,
+      "runtime": {
+        "texture": null
+      }
+    },
+    "color1": {
+      "type": "c",
+      "glslType": "vec3",
+      "value": {
+        "r": 0,
+        "g": 0.9450980392156862,
+        "b": 0.00784313725490196
+      },
+      "description": "",
+      "textureId": null,
+      "runtime": {
+        "texture": null
+      }
+    },
+    "color2": {
+      "type": "c",
+      "glslType": "vec3",
+      "value": {
+        "r": 1,
+        "g": 0.1607843137254902,
+        "b": 0.2627450980392157
+      },
+      "description": "",
+      "textureId": null,
+      "runtime": {
+        "texture": null
+      }
+    },
+    "color3": {
+      "type": "c",
+      "glslType": "vec3",
+      "value": {
+        "r": 0.9921568627450981,
+        "g": 0.984313725490196,
+        "b": 0
+      },
+      "description": "",
+      "textureId": null,
+      "runtime": {
+        "texture": null
+      }
+    },
+    "color4": {
+      "type": "c",
+      "glslType": "vec3",
+      "value": {
+        "r": 0.5019607843137255,
+        "g": 0.9725490196078431,
+        "b": 0
+      },
+      "description": "",
+      "textureId": null,
+      "runtime": {
+        "texture": null
+      }
+    }
+  }
+}

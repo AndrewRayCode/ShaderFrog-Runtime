@@ -5,8 +5,8 @@ var runtime = new ShaderFrogRuntime(),
 
 // Load multiple ShaderFrog shaders
 runtime.load([
-    'http://andrewray.me/stuff/Reflection_Cube_Map.json',
-    'http://andrewray.me/stuff/Water_or_Oil.json'
+    'https://s3-us-west-1.amazonaws.com/shader-frog/example/Reflection_Cube_Map.json',
+    'https://s3-us-west-1.amazonaws.com/shader-frog/example/Water_or_Oil.json'
 ], function( shaders ) {
 
     // `shaders` will be an array with the material data in the same order you

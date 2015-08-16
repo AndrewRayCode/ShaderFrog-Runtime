@@ -10,13 +10,13 @@ This is a utility library to load and update [ShaderFrog.com](http://shaderfrog.
 
 ## Demo
 
-[**Online Demo**](http://andrewray.me/ShaderFrog-Runtime/example/index.html)
+[**Online Demo**](http://shaderfrog.com/runtime/index.html)
 
 Demo source found in the [example/](https://github.com/DelvarWorld/ShaderFrog-Runtime/tree/master/example) folder.
 
 ## Usage
 
-Download the [built Javascript file](http://shaderfrog.com/shaderfrog-runtime.min.js) and include it in your project *after* THREE.js:
+Download the [built Javascript file](http://shaderfrog.com/runtime/shaderfrog-runtime.min.js) and include it in your project *after* THREE.js:
 
     <script src="shaderfrog-runtime.min.js"></script>
 
@@ -82,6 +82,10 @@ Load the specified URLs and parse them into materials. If you pass in an array o
 #### `runtime.get( String name )`
 
 The ShaderFrog runtime stores materials by name. This function returns a **new instance** of the material you have loaded. You can assign this new material to your object, update uniforms on it, etc.
+
+## Proposed Shader Format
+
+[ShaderFrog](http://shaderfrog.com) requires a shader file format to transfer all neccessary shader data from the editor to the end user. A proposed JSON format is discussed in [THREE_SHADER_FORMAT.md](https://github.com/DelvarWorld/ShaderFrog-Runtime/blob/master/README.md).
 
 ## Development
 

@@ -1,0 +1,35 @@
+{
+  "id": 84,
+  "name": "Reflection Cube Map",
+  "fragment": "precision highp float;\nprecision highp int;\n\nvarying vec3 vReflect;\n\nuniform float mirrorReflection;\nuniform samplerCube reflectionSampler;\n\nvoid main() {\n    vec4 cubeColor = textureCube( reflectionSampler, vec3( mirrorReflection * vReflect.x, vReflect.yz ) );\n    cubeColor.w = 1.0;\n    gl_FragColor = cubeColor;\n\n}",
+  "vertex": "precision highp float;\nprecision highp int;\n\nuniform mat4 modelMatrix;\nuniform mat4 modelViewMatrix;\nuniform mat4 projectionMatrix;\nuniform mat4 viewMatrix;\nuniform mat3 normalMatrix;\nuniform vec3 cameraPosition;\n\nattribute vec3 position;\nattribute vec3 normal;\nattribute vec2 uv;\nattribute vec2 uv2;\n\nvarying vec3 vReflect;\n\nvoid main() {\n    vec3 worldPosition = ( modelMatrix * vec4( position, 1.0 )).xyz;\n    vec3 cameraToVertex = normalize( worldPosition - cameraPosition );\n    vec3 worldNormal = normalize(\n        mat3( modelMatrix[ 0 ].xyz, modelMatrix[ 1 ].xyz, modelMatrix[ 2 ].xyz ) * normal\n    );\n    vReflect = reflect( cameraToVertex, worldNormal );\n    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\n}",
+  "uniforms": {
+    "cameraPosition": {
+      "name": "cameraPosition",
+      "type": "v3",
+      "glslType": "vec3",
+      "description": ""
+    },
+    "mirrorReflection": {
+      "name": "mirrorReflection",
+      "type": "f",
+      "glslType": "float",
+      "value": "1",
+      "description": ""
+    },
+    "reflectionSampler": {
+      "name": "reflectionSampler",
+      "type": "t",
+      "glslType": "samplerCube",
+      "value": {
+        "id": 2,
+        "image": "nissi_beach.jpg",
+        "thumbnail": "thumb_nissi_beach.jpg",
+        "name": "Nissi Beach",
+        "description": "Nissi Beach",
+        "isSamplerCube": true
+      },
+      "description": "I am a description of a uniform!"
+    }
+  }
+}
