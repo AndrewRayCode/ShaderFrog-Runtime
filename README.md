@@ -85,7 +85,7 @@ The ShaderFrog runtime stores materials by name. This function returns a **new i
 
 ## Proposed Shader Format
 
-[ShaderFrog](http://shaderfrog.com) requires a shader file format to transfer all neccessary shader data from the editor to the end user. A proposed JSON format is discussed in [THREE_SHADER_FORMAT.md](https://github.com/DelvarWorld/ShaderFrog-Runtime/blob/master/README.md).
+[ShaderFrog](http://shaderfrog.com) requires a shader file format to transfer all neccessary shader data from the editor to the end user. A proposed JSON format is discussed in [THREE_SHADER_FORMAT.md](https://github.com/DelvarWorld/ShaderFrog-Runtime/blob/master/THREE_SHADER_FORMAT.md).
 
 ## Development
 
