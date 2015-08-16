@@ -1,6 +1,6 @@
 # Problem
 
-THREE.js does not have a defined shader format for sharing raw GLSL shader code to load into a [`RawShaderMaterial`](http://threejs.org/docs/#Reference/Materials/RawShaderMaterial) [ShaderFrog](http://shaderfrog.com) requires a format to make shaders portable to the end user. This document suggests such a format.
+THREE.js does not have a defined shader format for sharing raw GLSL shader code to load into a [`RawShaderMaterial`](http://threejs.org/docs/#Reference/Materials/RawShaderMaterial). [ShaderFrog](http://shaderfrog.com) requires a format to make shaders portable to the end user. This document suggests such a format.
 
 This proposed format has some main pragmatic goals:
  - Provide a way to identify a shader when used in the end user's application;
