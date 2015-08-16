@@ -9,7 +9,8 @@ var config = {
     output: {
         filename: 'shaderfrog-runtime.min.js',
         library: 'ShaderFrogRuntime',
-        libraryTarget: 'var'
+        libraryTarget: 'var',
+        pubicPath: 'https://s3-us-west-1.amazonaws.com/shader-frog/example/'
     },
     resolveLoader: {
         root: path.join(__dirname, 'scripts/loaders')
