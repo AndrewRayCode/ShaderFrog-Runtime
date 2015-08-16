@@ -91,10 +91,16 @@ Shaders should ship with default values to minimize the amount of code the user 
         "isSamplerCube": true
     },
 
-**samplerCube (Three.TextureCube)** for real-time reflections
+**samplerCube (Three.CubeCamera)** for real-time reflections
 
     "value": {
         "isCubeCamera": true
+    },
+
+**sampler2D (Three.Texture)**
+
+    "value": {
+        "image": "http://full-path-to-img.extension",
     },
 
 **mat3, mat4**
