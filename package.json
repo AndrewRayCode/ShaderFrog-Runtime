@@ -1,11 +1,12 @@
 {
   "name": "shaderfrog-runtime",
-  "version": "0.0.1",
+  "version": "0.0.11",
   "description": "ShaderFrog runtime library",
-  "main": "ShaderRuntime.js",
+  "main": "lib/shaderfrog-runtime.js",
   "scripts": {
-    "build": "NODE_ENV=production webpack --progress --config webpack.config.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile": "NODE_ENV=production webpack --progress --config webpack.config.npm.js",
+    "test": "echo 'Error: no test specified' && exit 1",
+    "prepublish": "npm run compile"
   },
   "repository": {
     "type": "git",

@@ -5,7 +5,7 @@ var runtime = new ShaderFrogRuntime(),
 
 // Load multiple ShaderFrog shaders
 runtime.load([
-    'http://andrewray.me/stuff/Copy_of_Gems.json',
+    'http://andrewray.me/stuff/Reflection_Cube_Map.json',
     'https://s3-us-west-1.amazonaws.com/shader-frog/example/Water_or_Oil.json'
 ], function( shaders ) {
 
