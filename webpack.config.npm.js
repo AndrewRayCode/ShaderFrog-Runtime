@@ -4,7 +4,7 @@ var WebpackNotifierPlugin = require('webpack-notifier');
 
 var config = {
     entry: {
-        runtime: './ShaderRuntime.js'
+        runtime: './src/ShaderRuntime.js'
     },
     output: {
         path: 'lib',
