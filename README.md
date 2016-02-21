@@ -16,9 +16,19 @@ Demo source found in the [example/](https://github.com/DelvarWorld/ShaderFrog-Ru
 
 ## Usage
 
+### npm
+
+    npm install --save shaderfrog-runtime
+
+    var ShaderFrogRuntime = require( 'shaderfrog-runtime' ):
+
+### Vanilla JavaScript
+
 Download the [built Javascript file](http://shaderfrog.com/runtime/shaderfrog-runtime.min.js) and include it in your project *after* THREE.js:
 
     <script src="shaderfrog-runtime.min.js"></script>
+
+### Instantiation
 
 Instantiate a new runtime:
 
