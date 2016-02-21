@@ -5,7 +5,7 @@ var runtime = new ShaderFrogRuntime(),
 
 // Load multiple ShaderFrog shaders
 runtime.load([
-    'https://s3-us-west-1.amazonaws.com/shader-frog/example/Reflection_Cube_Map.json',
+    'http://andrewray.me/stuff/Copy_of_Gems.json',
     'https://s3-us-west-1.amazonaws.com/shader-frog/example/Water_or_Oil.json'
 ], function( shaders ) {
 
@@ -19,7 +19,11 @@ runtime.load([
     // You set uniforms the same way as a regular THREE.js shader. In this
     // case, the shader uses a cube camera for reflection, so we have to set
     // its value to the renderTarget of a cubeCamera we create
-    materialTop.uniforms.reflectionSampler.value = cubeCamera.renderTarget;
+    THREE.ImageUtils.crossOrigin = '';
+    var urls = [ 'posx', 'negx', 'posy', 'negy', 'posz', 'negz' ].map( ( url ) => {
+        return 'https://s3-us-west-1.amazonaws.com/shader-frog/' + url + '_lanc_chapel.jpg';
+    });
+    materialTop.uniforms.iChannel0.value = THREE.ImageUtils.loadTextureCube( urls );
     meshTop.material = materialTop;
 
     // ShaderFrog shader 2 (oily effect)

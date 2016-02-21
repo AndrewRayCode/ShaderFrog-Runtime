@@ -1,6 +1,6 @@
 {
   "name": "shaderfrog-runtime",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "ShaderFrog runtime library",
   "main": "ShaderRuntime.js",
   "scripts": {
