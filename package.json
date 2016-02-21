@@ -1,10 +1,10 @@
 {
   "name": "shaderfrog-runtime",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "ShaderFrog runtime library",
   "main": "lib/shaderfrog-runtime.js",
   "scripts": {
-    "compile": "NODE_ENV=production webpack --progress --config webpack.config.npm.js",
+    "compile": "babel --out-file lib/shaderfrog-runtime.js src/ShaderRuntime.js",
     "test": "echo 'Error: no test specified' && exit 1",
     "prepublish": "npm run compile"
   },
@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/DelvarWorld/ShaderFrog-Runtime#readme",
   "dependencies": {
-    "babel": "^5.8.21",
+    "babel": "^5.8.35",
     "babel-core": "^5.8.21",
     "babel-loader": "^5.3.2",
     "three": "^0.71.0",
