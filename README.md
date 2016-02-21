@@ -89,6 +89,10 @@ Call this function with either:
 
 Load the specified URLs and parse them into materials. If you pass in an array of URLs, the callback receives an array of materials in the same order you specified.
 
+#### `runtime.add( String name, Object shader )`
+
+If your shader data is already loaded in JSON form by some other means, you can add it to the runtime's repository of known shaders with this method.
+
 #### `runtime.get( String name )`
 
 The ShaderFrog runtime stores materials by name. This function returns a **new instance** of the material you have loaded. You can assign this new material to your object, update uniforms on it, etc.

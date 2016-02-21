@@ -1,11 +1,11 @@
 import THREE from 'three';
 
-function ShaderRuntime() {}
-
 let defaultThreeUniforms = [
     'normalMatrix', 'viewMatrix', 'projectionMatrix', 'position', 'normal',
     'modelViewMatrix', 'uv', 'uv2', 'modelMatrix'
 ];
+
+function ShaderRuntime() {}
 
 ShaderRuntime.prototype = {
 
