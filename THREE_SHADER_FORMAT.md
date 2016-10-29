@@ -8,7 +8,7 @@ This proposed format has some main pragmatic goals:
 
 # Proposed Format
 
-An incomplete example can be found at [Reflection_Cube_Map.json](https://github.com/DelvarWorld/ShaderFrog-Runtime/blob/master/example/Reflection_Cube_Map.json). The format is described with comments below.
+An incomplete example can be found at [Reflection_Cube_Map.json](https://github.com/AndrewRayCode/ShaderFrog-Runtime/blob/master/example/Reflection_Cube_Map.json). The format is described with comments below.
 
 The suggested format is a valid JSON file. It contains no executable Javascript as is not loaded via JSONP. Example data is included with each key as well as if the key is required or not.
 

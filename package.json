@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/DelvarWorld/ShaderFrog-Runtime.git"
+    "url": "git+ssh://git@github.com/AndrewRayCode/ShaderFrog-Runtime.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/DelvarWorld/ShaderFrog-Runtime/issues"
+    "url": "https://github.com/AndrewRayCode/ShaderFrog-Runtime/issues"
   },
-  "homepage": "https://github.com/DelvarWorld/ShaderFrog-Runtime#readme",
+  "homepage": "https://github.com/AndrewRayCode/ShaderFrog-Runtime#readme",
   "dependencies": {
     "babel": "^5.8.35",
     "babel-core": "^5.8.21",

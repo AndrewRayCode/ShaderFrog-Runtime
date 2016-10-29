@@ -2,7 +2,7 @@
 
 **Please file [ShaderFrog.com](http://shaderfrog.com) bugs here!**
 
-[ShaderFrog](http://shaderfrog.com) is currently closed source. Please file bugs here, using the [issue tracker](https://github.com/DelvarWorld/ShaderFrog-Runtime/issues).
+[ShaderFrog](http://shaderfrog.com) is currently closed source. Please file bugs here, using the [issue tracker](https://github.com/AndrewRayCode/ShaderFrog-Runtime/issues).
 
 # ShaderFrog Runtime Library
 
@@ -12,7 +12,7 @@ This is a utility library to load and update [ShaderFrog.com](http://shaderfrog.
 
 [**Online Demo**](http://shaderfrog.com/runtime/index.html)
 
-Demo source found in the [example/](https://github.com/DelvarWorld/ShaderFrog-Runtime/tree/master/example) folder.
+Demo source found in the [example/](https://github.com/AndrewRayCode/ShaderFrog-Runtime/tree/master/example) folder.
 
 ## Usage
 
@@ -59,7 +59,7 @@ In your animation loop, update the running shaders that the ShaderFrog runtime k
 
     runtime.updateShaders( clock.getElapsedTime() );
 
-A full example can be found in the [example/](https://github.com/DelvarWorld/ShaderFrog-Runtime/tree/master/example) folder.
+A full example can be found in the [example/](https://github.com/AndrewRayCode/ShaderFrog-Runtime/tree/master/example) folder.
 
 ## API
 
@@ -99,13 +99,13 @@ The ShaderFrog runtime stores materials by name. This function returns a **new i
 
 ## Proposed Shader Format
 
-[ShaderFrog](http://shaderfrog.com) requires a shader file format to transfer all neccessary shader data from the editor to the end user. A proposed JSON format is discussed in [THREE_SHADER_FORMAT.md](https://github.com/DelvarWorld/ShaderFrog-Runtime/blob/master/THREE_SHADER_FORMAT.md).
+[ShaderFrog](http://shaderfrog.com) requires a shader file format to transfer all neccessary shader data from the editor to the end user. A proposed JSON format is discussed in [THREE_SHADER_FORMAT.md](https://github.com/AndrewRayCode/ShaderFrog-Runtime/blob/master/THREE_SHADER_FORMAT.md).
 
 ## Development
 
 To install the dependencies:
 
-    git clone https://github.com/DelvarWorld/ShaderFrog-Runtime
+    git clone https://github.com/AndrewRayCode/ShaderFrog-Runtime
     npm install
 
 To build the distributable Javascript file:
