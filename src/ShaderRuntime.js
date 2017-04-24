@@ -1,4 +1,4 @@
-import THREE from 'three';
+import * as THREE from 'three';
 
 let defaultThreeUniforms = [
     'normalMatrix', 'viewMatrix', 'projectionMatrix', 'position', 'normal',
@@ -189,8 +189,17 @@ ShaderRuntime.prototype = {
     create( identifier ) {
 
         let shaderType = this.shaderTypes[ identifier ];
+        let keys = Object.keys( shaderType );
 
-        shaderType.material = new THREE.RawShaderMaterial( shaderType );
+        // Three's shadermaterial id is not assignable, so filter it out
+        let withoutId = {};
+        for( let i = 0; i < keys.length; i++ ) {
+            if( keys[ i ] !== 'id' ) {
+                withoutId[ keys[ i ] ] = shaderType[ keys[ i ] ];
+            }
+        }
+
+        shaderType.material = new THREE.RawShaderMaterial( withoutId );
 
         this.runningShaders.push( shaderType );
 
