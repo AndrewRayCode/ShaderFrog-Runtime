@@ -43,7 +43,7 @@ ShaderRuntime.prototype = {
 
         let loadSource = ( index, source ) => {
 
-            let loader = new THREE.XHRLoader();
+            let loader = new THREE.FileLoader();
             loader.load( source, ( json ) => {
 
                 let parsed;
@@ -71,7 +71,7 @@ ShaderRuntime.prototype = {
 
     registerCamera( camera ) {
 
-        if( !( camera instanceof THREE.Camera ) ) {
+        if( !( camera.isCamera ) ) {
             throw new Error( 'Cannot register a non-camera as a camera!' );
         }
 
@@ -94,7 +94,7 @@ ShaderRuntime.prototype = {
         if( name in this.cubeCameras ) {
 
             delete this.cubeCameras[ name ];
-            
+
         } else if( name === this.mainCamera ) {
 
             delete this.mainCamera;
@@ -174,7 +174,7 @@ ShaderRuntime.prototype = {
                 newData.uniforms[ uniformName ].value = this.getUmap( uniform.glslType );
             }
         }
-        
+
         if( shaderName in this.shaderTypes ) {
             // maybe not needed? too sleepy, need document
             extend( this.shaderTypes[ shaderName ], newData );
