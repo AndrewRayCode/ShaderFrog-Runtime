@@ -2,7 +2,20 @@
 
 **Please file [ShaderFrog.com](http://shaderfrog.com) bugs here!**
 
-[ShaderFrog](http://shaderfrog.com) is currently closed source. Please file bugs here, using the [issue tracker](https://github.com/AndrewRayCode/ShaderFrog-Runtime/issues).
+# Deprecation Notice: State of ShaderFrog
+
+The current ShaderFrog site and engine is in maintenence mode only. The core
+engine and compiler are buggy and I haven't actively developed on the current
+version of ShaderFrog in several years now. Due to buggy and fundamentally
+flawed core nature of ShaderFrog, I'm no longer actively working on it. I
+apologize for any frustration the bugs or lack of support have caused to your
+development process.
+
+Instead, I'm working on a new version of the algorithm, Shaderfrog 2.0, starting with a
+ground up build of a [GLSL compiler](https://www.npmjs.com/package/@shaderfrog/glsl-parser). I post updates when I have them [as @andrewray on Twitter](https://twitter.com/andrewray)
+if you want to follow along. There is no ETA on a new launch date. As of October
+2021, I've made significant progress on ShaderFrog 2.0, and I hope to keep
+posting regular updates and share demos as soon as I have them.
 
 # ShaderFrog Runtime Library
 
